@@ -7,6 +7,8 @@ from .models import Mijoz, Xodim, Tovar, Zakaz, ZakazItem
 from rest_framework.response import Response
 from rest_framework import serializers
 
+from django.db.models import Sum, F
+
 class TovarSerializer(serializers.ModelSerializer):
     class Meta:
         model = Zakaz
@@ -37,6 +39,33 @@ class XodimSerializer(serializers.ModelSerializer):
 # @api_view([])
 
 
+class EmployeeView(APIView):
+
+    def get(self,request, pk, *args, **kwargs):
+
+        month = request.query_params.get('month')
+        year = request.query_params.get('year')
+
+        try:
+            month = int(month)
+            year = int(year)
+        except Exception as e:
+            return Response({"error":"please enter integer to month and year"})
+        
+        zakaz = Zakaz.objects.filter(xodim=pk)
+
+        xodim_ism = Xodim.objects.get(pk=pk).name
+        mijozlar = Zakaz.values('mijoz').distinct().count()
+        tovarlar_soni = ZakazItem.objects.filter(zakaz__in=zakaz).aggregate(umumiy = Sum('soni'))['total'] or 0
+        summasi = ZakazItem.objects.filter(zakaz_int=zakaz).aggregate(umumiy = Sum(F('price') * F('soni')))['total'] or 0
+
+        data = {
+            "id" : pk,
+            "xodim ismi" : xodim_ism,
+            "mijozlar" : mijozlar,
+            "tovarlar" : tovarlar_soni,
+            "summasi" : summasi
+        }
 
 
     # @swagger_auto_schema(method='get')
@@ -55,9 +84,6 @@ class StatisticsViews(APIView):
             return Response({"error":str(e)})
         zakaz = Zakaz.objects.filter(xodim_id=pk)
         xodim = Xodim.objects.all()
-        # mijoz = Mijoz.objects.all()
-        # tovar = Zakaz.objects.all()
-        # statistic = Statistics.objects.all()
 
         # statist = Statistics.objects.filter(xodim = pk).first()
 
@@ -75,13 +101,16 @@ class StatisticsViews(APIView):
         xodim_ism = Xodim.objects.get(pk=pk).name
         total_zakaz = zakaz.count()
         unique_clients = zakaz.values("mijoz").distinct().count()
-        total_products = sum(item.quantity for o in zakaz for item in o.items.all())
+        # total_products = sum(item.quantity for o in zakaz for item in o.items.all())
+
+        total_products = ZakazItem.objects.filter(zakaz__in=zakaz).aggregate(total = Sum('soni'))['total'] or 0
+
         soni = 0
         for i in zakaz:
             for j in i.items.all():
                 pass
-                            
-        total_sales = sum(item.quantity * item.price for o in zakaz for item in o.items.all())
+        total_sales = ZakazItem.objects.filter(zakaz__in=zakaz).aggregate(total = Sum(F('price') * F('soni')))['total'] or 0
+        # total_sales = sum(item.quantity * item.price for o in zakaz for item in o.items.all())
 
         print(mijozlar_soni)
         data = {
@@ -95,3 +124,4 @@ class StatisticsViews(APIView):
 
         # # serializer = StatisticsSerializer(statistic, many=True)
         # return Response(serializer.data)
+    
