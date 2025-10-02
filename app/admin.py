@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Tovar, Xodim, Zakaz , Mijoz, Statistics
+from .models import Tovar, Xodim, Zakaz , Mijoz
 
 # Register your models here.
 
@@ -7,5 +7,5 @@ from .models import Tovar, Xodim, Zakaz , Mijoz, Statistics
 admin.site.register(Xodim)
 admin.site.register(Mijoz)
 admin.site.register(Zakaz)
-admin.site.register(Statistics)
+# admin.site.register(Statistics)
 admin.site.register(Tovar)

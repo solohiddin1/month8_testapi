@@ -31,17 +31,18 @@ class Tovar(models.Model):
 class Zakaz(models.Model):
     mijoz = models.ForeignKey(Mijoz, on_delete=models.CASCADE)
     xodim = models.ForeignKey(Xodim, on_delete=models.CASCADE)
-    tovar = models.ForeignKey(Tovar,on_delete=models.CASCADE,null=True)
+    # tovar = models.ForeignKey(Tovar,on_delete=models.CASCADE,null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
 
     # def __str__(self):
     #     return self.name
 
-class Statistics(models.Model):
-    xodim = models.ForeignKey(Xodim,on_delete=models.CASCADE)
-    mijoz = models.ForeignKey(Mijoz,on_delete=models.CASCADE)
-    zakaz = models.ForeignKey(Zakaz,on_delete=models.CASCADE)
+class ZakazItem(models.Model):
+    zakaz = models.ForeignKey(Zakaz,related_name='items', on_delete=models.CASCADE)
+    tovar = models.ForeignKey(Tovar,on_delete=models.CASCADE)
+    soni = models.PositiveIntegerField(default=1)
+    price = models.DecimalField(max_digits=12,decimal_places=2)
 
 
     # def __str__(self):
