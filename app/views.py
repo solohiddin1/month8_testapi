@@ -72,25 +72,20 @@ class StatisticsViews(APIView):
         # zakaz1 = 
         mahsulotlar_soni = zakaz.count()
 
-
-        # for i in xodim:
-        #     print(i.id)
-        # print(zakaz)
-        # for z in zakaz:
-        #     # print(z.mijoz.id,z.xodim.id,)
-        #     if z.xodim.id == pk:
-        #         mijozlar_soni += 1
-        # xodim_id = 1
-
-
+        xodim_ism = Xodim.objects.get(pk=pk).name
         total_zakaz = zakaz.count()
         unique_clients = zakaz.values("mijoz").distinct().count()
         total_products = sum(item.quantity for o in zakaz for item in o.items.all())
+        soni = 0
+        for i in zakaz:
+            for j in i.items.all():
+                pass
+                            
         total_sales = sum(item.quantity * item.price for o in zakaz for item in o.items.all())
 
         print(mijozlar_soni)
         data = {
-            "employee_id": pk,
+            "employee_name": xodim_ism,
             "total_orders": total_zakaz,
             "unique_clients": unique_clients,
             "total_products": total_products,
