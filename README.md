@@ -5,6 +5,7 @@ This is a Django project containerized with **Docker** and **PostgreSQL**.
 ---
 
 ## 🚀 Features
+
 - Django backend
 - PostgreSQL database
 - Docker Compose for easy setup
@@ -16,9 +17,11 @@ This is a Django project containerized with **Docker** and **PostgreSQL**.
 ## 🛠️ Setup
 
 ### 1. Clone repo & install Docker
+
 Make sure you have **Docker** and **docker-compose** installed.
 
 ### 2. Build containers
+
 ```bash
 docker-compose up --build
 
@@ -87,6 +90,7 @@ Default values (change in docker-compose.yml or .env):
     Password: mypassword
 
     Host: db (inside containers)
+<<<<<<< HEAD
 
 
 ## 📊 API Endpoints
@@ -119,3 +123,6 @@ Returns:
 - Full name
 - Number of purchased products
 - Total purchase amount
+=======
+```
+>>>>>>> e77c70e (read)
