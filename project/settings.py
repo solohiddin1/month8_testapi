@@ -83,7 +83,7 @@ DATABASES = {
         'NAME': 'api',
         'USER': 'postgres',
         'PASSWORD': 'solohiddin',
-        'HOST': 'localhost',
+        'HOST': 'db',
         'PORT': '5432',
     }
 }
