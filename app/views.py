@@ -9,20 +9,20 @@ from rest_framework import serializers
 
 from django.db.models import Sum, F
 
-class TovarSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Zakaz
-        fields = '__all__'    
+# class TovarSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Zakaz
+#         fields = '__all__'    
 
-class MijozSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Xodim
-        fields = '__all__'    
+# class MijozSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Xodim
+#         fields = '__all__'    
 
-class XodimSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Tovar
-        fields = '__all__'    
+# class XodimSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Tovar
+#         fields = '__all__'    
 
 # class ZakazSerializer(serializers.ModelSerializer):
 #     class Meta:
@@ -53,11 +53,15 @@ class EmployeeView(APIView):
             return Response({"error":"please enter integer to month and year"})
         
         zakaz = Zakaz.objects.filter(xodim=pk)
+        if month:
+            zakaz = zakaz.filter(created_at__month=month)
+        if year:
+            zakaz = zakaz.filter(created_at__year=year)
 
         xodim_ism = Xodim.objects.get(pk=pk).name
-        mijozlar = Zakaz.values('mijoz').distinct().count()
-        tovarlar_soni = ZakazItem.objects.filter(zakaz__in=zakaz).aggregate(umumiy = Sum('soni'))['total'] or 0
-        summasi = ZakazItem.objects.filter(zakaz_int=zakaz).aggregate(umumiy = Sum(F('price') * F('soni')))['total'] or 0
+        mijozlar = zakaz.values('mijoz').distinct().count()
+        tovarlar_soni = ZakazItem.objects.filter(zakaz__in=zakaz).aggregate(umumiy = Sum('soni'))['umumiy'] or 0
+        summasi = ZakazItem.objects.filter(zakaz__in=zakaz).aggregate(umumiy = Sum(F('price') * F('soni')))['umumiy'] or 0
 
         data = {
             "id" : pk,
@@ -67,6 +71,7 @@ class EmployeeView(APIView):
             "summasi" : summasi
         }
 
+        return Response(data)
 
     # @swagger_auto_schema(method='get')
 
