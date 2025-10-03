@@ -1,11 +1,6 @@
-from django.shortcuts import render
-# Create your views here.
-
-from drf_yasg.utils import swagger_auto_schema
 from rest_framework.decorators import api_view, APIView
 from .models import Mijoz, Xodim, Tovar, Zakaz, ZakazItem 
 from rest_framework.response import Response
-from rest_framework import serializers
 
 from django.db.models import Sum, F
 
@@ -38,6 +33,36 @@ from django.db.models import Sum, F
 
 # @api_view([])
 
+class StatisticsClient(APIView):
+
+    def get(self, request, pk, *args, **kwargs):
+        year = request.query_params.get("year")
+        month = request.query_params.get("month")
+        
+        try:
+            year = int(year)
+            month = int(month)
+        except Exception as e:
+            return Response({"error":str(e)})
+
+        zakaz = Zakaz.objects.filter(mijoz_id=pk)
+        if year:
+            zakaz = zakaz.filter(created_at__year=year)
+        if month:
+            zakaz = zakaz.filter(created_at__month=month)
+            
+        client = Mijoz.objects.get(pk=pk)
+
+        tovarlar_soni = ZakazItem.objects.filter(zakaz__in=zakaz).aggregate(umumiy = Sum('soni'))['umumiy'] or 0
+        summasi = ZakazItem.objects.filter(zakaz__in=zakaz).aggregate(umumiy = Sum(F('price') * F('soni')))['umumiy'] or 0
+
+        data = {
+                "client_id" : client.id,
+                "client_name" : client.name,
+                "tovarlar " : tovarlar_soni,
+                "summasi" : summasi
+            }
+        return Response(data)
 
 class EmployeeView(APIView):
 
