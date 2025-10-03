@@ -87,3 +87,35 @@ Default values (change in docker-compose.yml or .env):
     Password: mypassword
 
     Host: db (inside containers)
+
+
+## 📊 API Endpoints
+
+### 1. Employee Statistics (single employee)
+**GET** `/statistics/employee/{id}/?month={month}&year={year}`  
+Returns:
+- Full name of employee
+- Number of clients
+- Number of products sold
+- Total sales amount
+
+---
+
+### 2. Employee Statistics (all employees)
+**GET** `/employee/statistics/?month={month}&year={year}`  
+Returns a list of employees with:
+- Employee ID
+- Full name
+- Number of clients
+- Number of products sold
+- Total sales amount
+
+---
+
+### 3. Client Statistics
+**GET** `/statistics/client/{id}/?month={month}&year={year}`  
+Returns:
+- Client ID
+- Full name
+- Number of purchased products
+- Total purchase amount
