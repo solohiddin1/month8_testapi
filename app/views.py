@@ -41,7 +41,7 @@ from django.db.models import Sum, F
 
 class EmployeeView(APIView):
 
-    def get(self,request, pk, *args, **kwargs):
+    def get(self,request, *args, **kwargs):
 
         month = request.query_params.get('month')
         year = request.query_params.get('year')
@@ -52,26 +52,32 @@ class EmployeeView(APIView):
         except Exception as e:
             return Response({"error":"please enter integer to month and year"})
         
-        zakaz = Zakaz.objects.filter(xodim=pk)
-        if month:
-            zakaz = zakaz.filter(created_at__month=month)
-        if year:
-            zakaz = zakaz.filter(created_at__year=year)
+        result = []
+        xodim = Xodim.objects.all()
+        for i in xodim:
+            print(i.id, i.name)
+            zakaz = Zakaz.objects.filter(xodim_id=i.id)
+            print(zakaz)
+            if month:
+                zakaz = zakaz.filter(created_at__month=month)
+            if year:
+                zakaz = zakaz.filter(created_at__year=year)
 
-        xodim_ism = Xodim.objects.get(pk=pk).name
-        mijozlar = zakaz.values('mijoz').distinct().count()
-        tovarlar_soni = ZakazItem.objects.filter(zakaz__in=zakaz).aggregate(umumiy = Sum('soni'))['umumiy'] or 0
-        summasi = ZakazItem.objects.filter(zakaz__in=zakaz).aggregate(umumiy = Sum(F('price') * F('soni')))['umumiy'] or 0
 
-        data = {
-            "id" : pk,
-            "xodim ismi" : xodim_ism,
-            "mijozlar" : mijozlar,
-            "tovarlar" : tovarlar_soni,
-            "summasi" : summasi
-        }
+            xodim_ism = i.name
+            mijozlar = zakaz.values('mijoz').distinct().count()
+            tovarlar_soni = ZakazItem.objects.filter(zakaz__in=zakaz).aggregate(umumiy = Sum('soni'))['umumiy'] or 0
+            summasi = ZakazItem.objects.filter(zakaz__in=zakaz).aggregate(umumiy = Sum(F('price') * F('soni')))['umumiy'] or 0
+            data = {
+                "id" : i.id,
+                "xodim ismi" : xodim_ism,
+                "mijozlar" : mijozlar,
+                "tovarlar" : tovarlar_soni,
+                "summasi" : summasi
+            }
+            result.append(data)
 
-        return Response(data)
+        return Response(result)
 
     # @swagger_auto_schema(method='get')
 
